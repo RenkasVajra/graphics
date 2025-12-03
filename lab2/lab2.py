@@ -99,7 +99,7 @@ while not glfw.window_should_close(window):
     # Нарисовать квадрат
     draw_quad(square_vertices, square_colors)
 
-    # Нарисовать круг (правильный многоугольник с большим количеством сторон)
+    # Нарисовать круг 
     circle_center = (0, 0, 0)
     circle_radius = 0.5
     circle_num_sides = 50
