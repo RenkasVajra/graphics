@@ -236,20 +236,19 @@ def draw_trapezoid(center_x, center_y, center_z, top_width, bottom_width, depth,
 
 def draw_tetrahedron(center_x, center_y, center_z, size, color, mode):
     """Рисует тетраэдр"""
-    # Вычисляем вершины тетраэдра
     a = size / math.sqrt(2)
     vertices = [
-        (center_x, center_y + a/2, center_z),                    # вершина
-        (center_x - a/2, center_y - a/6, center_z - a/2),       # основание левая задняя
-        (center_x + a/2, center_y - a/6, center_z - a/2),       # основание правая задняя
-        (center_x, center_y - a/6, center_z + a/2)              # основание передняя
+        (center_x, center_y + a/2, center_z),
+        (center_x - a/2, center_y - a/6, center_z - a/2),
+        (center_x + a/2, center_y - a/6, center_z - a/2),
+        (center_x, center_y - a/6, center_z + a/2)
     ]
 
     faces = [
-        (0, 1, 2),  # задняя грань
-        (0, 2, 3),  # правая грань
-        (0, 3, 1),  # левая грань
-        (1, 3, 2)   # основание
+        (0, 1, 2),
+        (0, 2, 3),
+        (0, 3, 1), 
+        (1, 3, 2) 
     ]
 
     glColor3fv(color)
@@ -319,36 +318,30 @@ def draw_cone(center_x, center_y, center_z, base_radius, height, segments, color
     base_y = center_y - height / 2.0
     apex_y = center_y + height / 2.0
 
-    # Вершины основания
     for i in range(segments):
         angle = 2.0 * math.pi * i / segments
         x = center_x + base_radius * math.cos(angle)
         z = center_z + base_radius * math.sin(angle)
         vertices.append((x, base_y, z))
 
-    # Вершина
     vertices.append((center_x, apex_y, center_z))
     apex_idx = segments
 
     glColor3fv(color)
     if mode == GL_LINE_LOOP:
         glBegin(GL_LINES)
-        # Ребра основания
         for i in range(segments):
             glVertex3fv(vertices[i])
             glVertex3fv(vertices[(i + 1) % segments])
-        # Ребра к вершине
         for i in range(segments):
             glVertex3fv(vertices[i])
             glVertex3fv(vertices[apex_idx])
     else:
-        # Основание
         glBegin(GL_POLYGON)
         for i in range(segments):
             glVertex3fv(vertices[i])
         glEnd()
 
-        # Боковая поверхность
         for i in range(segments):
             glBegin(GL_TRIANGLES)
             glVertex3fv(vertices[i])
@@ -358,19 +351,17 @@ def draw_cone(center_x, center_y, center_z, base_radius, height, segments, color
 
 
 def draw_cylinder(center_x, center_y, center_z, bottom_radius, top_radius, height, segments, color, mode):
-    """Рисует цилиндр (общий случай с разными радиусами оснований)"""
+    """Рисует цилиндр"""
     vertices = []
     bottom_y = center_y - height / 2.0
     top_y = center_y + height / 2.0
 
-    # Нижнее основание
     for i in range(segments):
         angle = 2.0 * math.pi * i / segments
         x = center_x + bottom_radius * math.cos(angle)
         z = center_z + bottom_radius * math.sin(angle)
         vertices.append((x, bottom_y, z))
 
-    # Верхнее основание
     for i in range(segments):
         angle = 2.0 * math.pi * i / segments
         x = center_x + top_radius * math.cos(angle)
@@ -383,32 +374,26 @@ def draw_cylinder(center_x, center_y, center_z, bottom_radius, top_radius, heigh
     glColor3fv(color)
     if mode == GL_LINE_LOOP:
         glBegin(GL_LINES)
-        # Ребра нижнего основания
         for i in range(segments):
             glVertex3fv(vertices[bottom_start + i])
             glVertex3fv(vertices[bottom_start + (i + 1) % segments])
-        # Ребра верхнего основания
         for i in range(segments):
             glVertex3fv(vertices[top_start + i])
             glVertex3fv(vertices[top_start + (i + 1) % segments])
-        # Боковые ребра
         for i in range(segments):
             glVertex3fv(vertices[bottom_start + i])
             glVertex3fv(vertices[top_start + i])
     else:
-        # Нижнее основание
         glBegin(GL_POLYGON)
         for i in range(segments):
             glVertex3fv(vertices[bottom_start + i])
         glEnd()
 
-        # Верхнее основание
         glBegin(GL_POLYGON)
         for i in range(segments):
             glVertex3fv(vertices[top_start + i])
         glEnd()
 
-        # Боковая поверхность
         for i in range(segments):
             glBegin(GL_QUADS)
             glVertex3fv(vertices[bottom_start + i])
@@ -419,15 +404,14 @@ def draw_cylinder(center_x, center_y, center_z, bottom_radius, top_radius, heigh
 
 
 def draw_sphere_lines(center_x, center_y, center_z, radius, segments, color):
-    """Рисует сферу апроксимацией линиями - упрощенная версия"""
+    """Рисует сферу апроксимацией линиями"""
     glColor3fv(color)
 
-    # Простая сетка из линий - меридианы и параллели
-    # Меридианы (вертикальные линии)
-    for i in range(8):  # 8 меридианов
+
+    for i in range(8): 
         phi = 2 * math.pi * i / 8
         glBegin(GL_LINE_STRIP)
-        for j in range(9):  # 9 точек по высоте
+        for j in range(9): 
             theta = math.pi * j / 8
             x = center_x + radius * math.sin(theta) * math.cos(phi)
             y = center_y + radius * math.sin(theta) * math.sin(phi)
@@ -435,11 +419,11 @@ def draw_sphere_lines(center_x, center_y, center_z, radius, segments, color):
             glVertex3f(x, y, z)
         glEnd()
 
-    # Параллели (горизонтальные линии)
-    for j in range(5):  # 5 параллелей
+
+    for j in range(5): 
         theta = math.pi * j / 4
         glBegin(GL_LINE_LOOP)
-        for i in range(16):  # 16 точек по окружности
+        for i in range(16):
             phi = 2 * math.pi * i / 16
             x = center_x + radius * math.sin(theta) * math.cos(phi)
             y = center_y + radius * math.sin(theta) * math.sin(phi)
@@ -452,7 +436,6 @@ def draw_sphere_triangles(center_x, center_y, center_z, radius, segments, color)
     """Рисует сферу апроксимацией треугольниками"""
     glColor3fv(color)
 
-    # Создаем вершины сферы
     vertices = []
     for j in range(segments // 2 + 1):
         theta = math.pi * j / (segments // 2)
@@ -464,17 +447,14 @@ def draw_sphere_triangles(center_x, center_y, center_z, radius, segments, color)
             z = center_z + radius * math.cos(theta)
             vertices.append((x, y, z))
 
-    # Рисуем треугольники
     for j in range(segments // 2):
         for i in range(segments):
-            # Первый треугольник
             glBegin(GL_TRIANGLES)
             glVertex3fv(vertices[j * (segments + 1) + i])
             glVertex3fv(vertices[j * (segments + 1) + i + 1])
             glVertex3fv(vertices[(j + 1) * (segments + 1) + i])
             glEnd()
 
-            # Второй треугольник
             glBegin(GL_TRIANGLES)
             glVertex3fv(vertices[j * (segments + 1) + i + 1])
             glVertex3fv(vertices[(j + 1) * (segments + 1) + i + 1])
@@ -483,26 +463,22 @@ def draw_sphere_triangles(center_x, center_y, center_z, radius, segments, color)
 
 
 def draw_sphere_pentagons(center_x, center_y, center_z, radius, color):
-    """Рисует сферу апроксимацией пятиугольниками (икосаэдр)"""
-    # Используем икосаэдр для апроксимации сферы
-    phi = (1 + math.sqrt(5)) / 2  # Золотое сечение
+    """Рисует икосаэдр"""
+    phi = (1 + math.sqrt(5)) / 2 
 
-    # Вершины икосаэдра
     vertices = [
         (0, 1, phi), (0, 1, -phi), (0, -1, phi), (0, -1, -phi),
         (1, phi, 0), (1, -phi, 0), (-1, phi, 0), (-1, -phi, 0),
         (phi, 0, 1), (phi, 0, -1), (-phi, 0, 1), (-phi, 0, -1)
     ]
 
-    # Нормализуем и масштабируем
     vertices = [(center_x + radius * x, center_y + radius * y, center_z + radius * z)
                 for x, y, z in vertices]
 
-    # Грани икосаэдра (пятиугольники)
     faces = [
         (0, 8, 4, 5, 1), (0, 1, 6, 10, 7), (1, 5, 9, 11, 6),
         (2, 3, 9, 5, 8), (2, 7, 10, 11, 3), (4, 8, 2, 7, 0),
-        (9, 3, 11), (10, 6, 11), (4, 0, 7), (5, 4, 8)  # треугольники для полноты
+        (9, 3, 11), (10, 6, 11), (4, 0, 7), (5, 4, 8)
     ]
 
     glColor3fv(color)
@@ -525,27 +501,24 @@ def draw_3d_spiral(center_x, center_y, center_z, radius, height, turns, segments
     for i in range(segments + 1):
         t = i / segments
         angle = t * turns * 2 * math.pi
-        r = radius * (1 - t * 0.3)  # Уменьшаем радиус к концу
+        r = radius * (1 - t * 0.3)
         x = center_x + r * math.cos(angle)
         y = center_y + height * t
         z = center_z + r * math.sin(angle)
         points.append((x, y, z))
 
     if mode == GL_LINE_LOOP:
-        # Рисуем линию
         glBegin(GL_LINE_STRIP)
         for point in points:
             glVertex3fv(point)
         glEnd()
     else:
-        # Для полигонов создаем ленту
         glBegin(GL_QUADS)
         width = 0.05
         for i in range(len(points) - 1):
             p1 = points[i]
             p2 = points[i + 1]
 
-            # Вычисляем перпендикуляр для ширины
             if i < len(points) - 2:
                 next_p = points[i + 2]
                 dir_x = next_p[0] - p1[0]
@@ -586,7 +559,6 @@ def draw_torus(center_x, center_y, center_z, major_radius, minor_radius, major_s
 
     if mode == GL_LINE_LOOP:
         glBegin(GL_LINES)
-        # Меридианы
         for i in range(major_segments):
             for j in range(minor_segments):
                 idx1 = i * (minor_segments + 1) + j
@@ -594,7 +566,6 @@ def draw_torus(center_x, center_y, center_z, major_radius, minor_radius, major_s
                 glVertex3fv(vertices[idx1])
                 glVertex3fv(vertices[idx2])
 
-        # Параллели
         for j in range(minor_segments):
             for i in range(major_segments):
                 idx1 = i * (minor_segments + 1) + j
@@ -602,7 +573,6 @@ def draw_torus(center_x, center_y, center_z, major_radius, minor_radius, major_s
                 glVertex3fv(vertices[idx1])
                 glVertex3fv(vertices[idx2])
     else:
-        # Полигоны
         for i in range(major_segments):
             for j in range(minor_segments):
                 idx1 = i * (minor_segments + 1) + j
@@ -658,7 +628,7 @@ def draw_octahedron(center_x, center_y, center_z, size, color, mode):
 
 def draw_icosahedron(center_x, center_y, center_z, size, color, mode):
     """Рисует икосаэдр"""
-    phi = (1 + math.sqrt(5)) / 2  # Золотое сечение
+    phi = (1 + math.sqrt(5)) / 2
 
     vertices = [
         (center_x + 0, center_y + 1, center_z + phi),
@@ -675,7 +645,6 @@ def draw_icosahedron(center_x, center_y, center_z, size, color, mode):
         (center_x - phi, center_y + 0, center_z - 1)
     ]
 
-    # Масштабируем
     vertices = [(x * size, y * size, z * size) for x, y, z in vertices]
 
     faces = [
@@ -692,7 +661,6 @@ def draw_icosahedron(center_x, center_y, center_z, size, color, mode):
         for face in faces:
             for i in range(len(face)):
                 edges.append((face[i], face[(i + 1) % len(face)]))
-        # Убираем дубликаты
         edges = list(set(edges))
         for edge in edges:
             glVertex3fv(vertices[edge[0]])
@@ -717,7 +685,6 @@ def draw_dodecahedron(center_x, center_y, center_z, size, color, mode):
         (phi, 1/phi, 0), (phi, -1/phi, 0), (-phi, 1/phi, 0), (-phi, -1/phi, 0)
     ]
 
-    # Центрируем и масштабируем
     vertices = [(center_x + x * size, center_y + y * size, center_z + z * size) for x, y, z in vertices]
 
     faces = [
@@ -733,7 +700,6 @@ def draw_dodecahedron(center_x, center_y, center_z, size, color, mode):
         for face in faces:
             for i in range(len(face)):
                 edges.append((face[i], face[(i + 1) % len(face)]))
-        # Убираем дубликаты
         edges = list(set(edges))
         for edge in edges:
             glVertex3fv(vertices[edge[0]])
@@ -772,7 +738,7 @@ def draw_cube(lx, ly, lz):
 
 def draw_spiral(radius, height, turns, segments):
     glBegin(GL_LINE_STRIP)
-    glColor3f(1, 0, 1) # Magenta
+    glColor3f(1, 0, 1)
     for i in range(segments + 1):
         angle = i / segments * turns * 2 * math.pi
         x = radius * math.cos(angle)
@@ -783,17 +749,15 @@ def draw_spiral(radius, height, turns, segments):
 
 glEnable(GL_DEPTH_TEST)
 
-# Функция обратного вызова для клавиатуры
 def key_callback(window, key, scancode, action, mods):
     global draw_mode_lines
     if action == glfw.PRESS:
-        if key == glfw.KEY_SPACE:  # Пробел для переключения режима
+        if key == glfw.KEY_SPACE:
             draw_mode_lines = not draw_mode_lines
             print(f"Режим переключен: {'Линии' if draw_mode_lines else 'Полигоны'}")
         elif key == glfw.KEY_ESCAPE:
             glfw.set_window_should_close(window, True)
 
-# Функция обратного вызова для мыши
 def mouse_button_callback(window, button, action, mods):
     global mouse_down, mouse_x, mouse_y
     if button == glfw.MOUSE_BUTTON_LEFT:
@@ -803,7 +767,6 @@ def mouse_button_callback(window, button, action, mods):
         elif action == glfw.RELEASE:
             mouse_down = False
 
-# Функция обратного вызова для движения мыши
 def cursor_pos_callback(window, xpos, ypos):
     global mouse_x, mouse_y, rotation_x, rotation_y, rotation_speed
     if mouse_down:
@@ -813,7 +776,6 @@ def cursor_pos_callback(window, xpos, ypos):
         rotation_y += delta_x * rotation_speed
         mouse_x, mouse_y = xpos, ypos
 
-# Функция обратного вызова для изменения размера окна
 def framebuffer_size_callback(window, width, height):
     glViewport(0, 0, width, height)
     glMatrixMode(GL_PROJECTION)
@@ -821,7 +783,6 @@ def framebuffer_size_callback(window, width, height):
     gluPerspective(45, width / height if height > 0 else 1, 0.1, 50.0)
     glMatrixMode(GL_MODELVIEW)
 
-# Устанавливаем обратные вызовы
 glfw.set_key_callback(window, key_callback)
 glfw.set_mouse_button_callback(window, mouse_button_callback)
 glfw.set_cursor_pos_callback(window, cursor_pos_callback)
@@ -841,24 +802,16 @@ while not glfw.window_should_close(window):
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
-    glTranslatef(0.0, 0.0, -8)  # Уменьшили расстояние до камеры
+    glTranslatef(0.0, 0.0, -8)
 
-    # Применяем вращение
     glRotatef(rotation_x, 1, 0, 0)
     glRotatef(rotation_y, 0, 1, 0)
 
-    # Анимируем некоторые объекты
     frame_count += 1
     anim_angle = frame_count * 0.5
 
-    # ============ Демонстрация геометрических фигур ============
-
-    # ============ Демонстрация геометрических фигур ============
-
-    # Используем правильный режим рисования
     draw_mode = GL_LINES if draw_mode_lines else GL_QUADS
 
-    # 2D фигуры (плоские)
     glPushMatrix()
     glTranslatef(-4, 2, 0)
     glScalef(0.3, 0.3, 1)
@@ -934,14 +887,12 @@ while not glfw.window_should_close(window):
 
     glPopMatrix()
 
-    # Отображаем информацию о режиме в заголовке окна
     mode_name = "Линии" if draw_mode_lines else "Полигоны"
     glfw.set_window_title(window, f"OpenGL Shapes Demo - Режим: {mode_name} (Пробел для переключения, Esc - выход)")
 
     glfw.swap_buffers(window)
     glfw.poll_events()
 
-    # Небольшая задержка для контроля FPS
     import time
     time.sleep(0.01)
 
